@@ -7,7 +7,7 @@ const checkUserVal = async (req,res,next) => { //this goes on login route !
       if(!user){
         res.status(401).json({message: 'invalid credentials'})
     } else {
-        req.user = user;
+        req.body = user;
         next();
     }
 } catch(err){
@@ -20,7 +20,6 @@ const checkBody = (req,res,next)=>{
     if(!req.body.username || !req.body.password){
         res.status(401).json({message: 'username and password required'})
     } else {
-      req.body.password = req.user.password;
       
         next();
     }
