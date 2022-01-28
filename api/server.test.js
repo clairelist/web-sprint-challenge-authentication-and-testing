@@ -29,7 +29,18 @@ describe('the daddio server',()=>{
   it('papi can log IN and generates correct success response (POST to /api/auth/login', async () => {
     const res = await request(server).post('/api/auth/login').send({ username: 'daddy', password: '1234' })
       expect(res.body.message).toMatch(/welcome, daddy/i)
-    }, 750); //this FAILS because of security issues. With current settings, it is throwing a 500 illegal args error on my enviro, but this might be different elsewhere.
+    }, 750); //currently broken !
+  
+  it('throws correct error on bad login infos (POST to /api/auth/login', async () => {
+   const res = await request(server).post('/api/auth/login').send({username: 'mama mia', password: 'xxxyyyzzz'});
+    expect(res.body.message).toMatch('invalid credentials');
+  });
+
+  it('can throw a daddy temper tantrum when registering a null username (POST to /api/auth/register)', async () =>{
+    const res = await request(server).post('/api/auth/register').send({password: 'blah'});
+    expect(res.body.message).toMatch('username and password required');
+  })
+
   });
 
 
