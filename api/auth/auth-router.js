@@ -13,7 +13,8 @@ const router = require('express').Router();
 function buildToken(user){
   const payload = {
     subject: user.id,
-    username: user.username
+    username: user.username,
+   
   };
   const options = {
     expiresIn: '1d',
@@ -58,7 +59,7 @@ router.post('/register', checkBody, checkUserExisty,(req, res, next) => { //pass
         .catch(next)
 });
 
-router.post('/login', checkUserVal, checkBody, (req, res,next) => {
+router.post('/login', checkUserVal, checkBody, async (req, res,next) => {
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -82,12 +83,31 @@ router.post('/login', checkUserVal, checkBody, (req, res,next) => {
     4- On FAILED login due to `username` not existing in the db, or `password` being incorrect,
       the response body should include a string exactly as follows: "invalid credentials".
   */
-      if (bcrypt.compareSync(req.body.password, req.user.password)){
-       const token = buildToken(req.user);
-        res.status(200).json({message:`welcome, ${req.user.username}`,token: token});
-      } else {
-        next({status: 401, message: 'invalid credentials'}); //password failstate
-      }
+      try{
+        //pull u & p from req body
+        const {username, password} = req.body;
+    
+        //pull user from db by that usernahme
+        const [user] = await Dad.getByFilter({username}); // --> array destructure because getBy returns an array
+        if (bcrypt.compareSync(password, user.password)) {
+            //password 1, do the thing !
+    
+            const token = buildToken(req.body);
+              res.status(200).json({message:`welcome, ${user.username}`, token});
+            } else {
+              next({status: 401, message: 'invalid credentials'}); //password failstate
+            }
+    
+    } catch(err){
+        next(err);
+    }
+      // if (bcrypt.compareSync(req.body.password, req.user.password)){
+      //  const token = buildToken(req.user);
+      //   res.status(200).json({message:`welcome, ${req.user.username}`,token: token});
+      // } else {
+      //   next({status: 401, message: 'invalid credentials'}); //password failstate
+      // }
+      
 });
 
 module.exports = router;

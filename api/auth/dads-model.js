@@ -7,29 +7,27 @@ function getAll(){
     return lego('users').select(); //nothing passed here, since we are returning all fields from the users table!
 }
 
-//build getById for callback of below --callback DEPRECATED
+//build getById for callback of below --callback
 //select * from users where id = user_id
 function getById(id){
     return lego('users')
-        .select()
-        .where('id',id).first();
+    .where('id', id )
+    .first();
 }
 
 //build getByFilter for calling on checky of username existy !
 async function getByFilter(filter){
     return lego('users')
-        .select('username')
         .where(filter);
 }
 //build create which checks for existing user, then returns that user if not existy before !
 //we are only using one table, so we don't need to use a transaction here.
 //it will be simple :)
-function create({username,password}){
-    return lego('users').insert({username,password})
-      .then(([id]) => {
-        return lego('users').where('id',id).first(); //NOT an array ! first method fixes this
-      })
-}
+async function create(user) {
+    const [id] = await lego('users').insert(user);
+  
+    return getById(id);
+  }
 
 //EXPORTR SECTION
 module.exports = {
