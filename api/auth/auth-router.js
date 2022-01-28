@@ -12,7 +12,7 @@ const router = require('express').Router();
 //unit function for building a token, used in login !
 function buildToken(user){
   const payload = {
-    subject: user.user_id,
+    subject: user.id,
     username: user.username
   };
   const options = {
@@ -83,8 +83,8 @@ router.post('/login', checkUserVal, checkBody, (req, res,next) => {
       the response body should include a string exactly as follows: "invalid credentials".
   */
       if (bcrypt.compareSync(req.body.password, req.user.password)){
-        const token = buildToken(req.user);
-        res.status(200).json({message:`welcome, ${req.user.username}`, token});
+       const token = buildToken(req.user);
+        res.status(200).json({message:`welcome, ${req.user.username}`,token: token});
       } else {
         next({status: 401, message: 'invalid credentials'}); //password failstate
       }
