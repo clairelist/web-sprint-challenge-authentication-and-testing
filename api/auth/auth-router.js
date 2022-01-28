@@ -1,4 +1,22 @@
+//DATA section, as always
+const { JWT_SECRET } = require("../geheimnisse"); // called so to obfuscate in the codebase!
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const router = require('express').Router();
+
+//LOGIC sectionr
+//unit function for building a token, used in login !
+function buildToken(user){
+  const payload = {
+    subject: user.user_id,
+    role_name: user.role_name,
+    username: user.username
+  };
+  const options = {
+    expiresIn: '1d',
+  };
+  return jwt.sign(payload,JWT_SECRET,options);
+}
 
 router.post('/register', (req, res) => {
   res.end('implement register, please!');
